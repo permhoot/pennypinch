@@ -1,0 +1,70 @@
+<!--
+Copyright © 2026 The Homeport Team
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+-->
+{{define "table-body"}}
+<div class="table-meta">
+  <span>{{.Total}} records</span>
+  <span class="page-info">Page {{.Page}} of {{.Pages}}</span>
+</div>
+
+<table class="expenses">
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Subject</th>
+      <th>Description</th>
+      <th>Category</th>
+      <th class="num">Amount ({{.Currency}})</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{range .Expenses}}
+    <tr>
+      <td class="date">{{.Date}}</td>
+      <td>{{.Subject}}</td>
+      <td class="muted">{{.Description}}</td>
+      <td><span class="category-chip">{{.Category}}</span></td>
+      <td class="num {{if .IsIncome}}income{{else}}expense{{end}}">{{if $.CurrencyInCells}}{{formatAmount .Amount $.Currency $.CurrencyPosition}}{{else}}{{money .Amount}}{{end}}</td>
+    </tr>
+    {{else}}
+    <tr><td colspan="5" class="empty">No expenses match your filters.</td></tr>
+    {{end}}
+  </tbody>
+</table>
+
+{{if gt .Pages 1}}
+<nav class="pagination">
+  {{if gt .Page 1}}
+  <a hx-get="/api/expenses/table?page={{sub .Page 1}}{{if .Query}}&{{.Query}}{{end}}" hx-target="#table-container" hx-push-url="false">Prev</a>
+  {{end}}
+  {{range pages .Page .Pages}}
+    {{if eq . 0}}
+    <span class="ellipsis">…</span>
+    {{else}}
+    <a class="{{if eq . $.Page}}current{{end}}" hx-get="/api/expenses/table?page={{.}}{{if $.Query}}&{{$.Query}}{{end}}" hx-target="#table-container" hx-push-url="false">{{.}}</a>
+    {{end}}
+  {{end}}
+  {{if lt .Page .Pages}}
+  <a hx-get="/api/expenses/table?page={{add .Page 1}}{{if .Query}}&{{.Query}}{{end}}" hx-target="#table-container" hx-push-url="false">Next</a>
+  {{end}}
+</nav>
+{{end}}
+{{end}}

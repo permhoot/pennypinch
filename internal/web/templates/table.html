@@ -1,0 +1,63 @@
+<!--
+Copyright © 2026 The Homeport Team
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+-->
+{{define "content"}}
+<div class="page-head">
+  <h1>Expenses</h1>
+</div>
+
+<div class="stats-bar">
+  <div class="stat"><span class="label">Income</span><span class="value income">{{formatAmount .Summary.TotalIncome .Currency .CurrencyPosition}}</span></div>
+  <div class="stat"><span class="label">Expenses</span><span class="value expense">{{formatAmount .Summary.TotalExpense .Currency .CurrencyPosition}}</span></div>
+  <div class="stat"><span class="label">Net</span><span class="value">{{formatAmount .Summary.Net .Currency .CurrencyPosition}}</span></div>
+  <div class="stat"><span class="label">Records</span><span class="value">{{.Summary.Count}}</span></div>
+</div>
+
+<form id="filters" class="filters" autocomplete="off">
+  <input type="search" name="search" placeholder="Search subject, description, category…" value="{{.Filter.Search}}"
+    hx-get="/api/expenses/table" hx-target="#table-container" hx-include="#filters" hx-trigger="keyup changed delay:350ms">
+  <input type="text" name="category" placeholder="Category" value="{{.Filter.Category}}"
+    hx-get="/api/expenses/table" hx-target="#table-container" hx-include="#filters" hx-trigger="change">
+  <input type="date" name="date_from" value="{{dateval .Filter.DateFrom}}" title="From date"
+    hx-get="/api/expenses/table" hx-target="#table-container" hx-include="#filters" hx-trigger="change">
+  <input type="date" name="date_to" value="{{dateval .Filter.DateTo}}" title="To date"
+    hx-get="/api/expenses/table" hx-target="#table-container" hx-include="#filters" hx-trigger="change">
+  <input type="number" step="0.01" name="amount_min" placeholder="Min" value="{{floatval .Filter.AmountMin}}"
+    hx-get="/api/expenses/table" hx-target="#table-container" hx-include="#filters" hx-trigger="change">
+  <input type="number" step="0.01" name="amount_max" placeholder="Max" value="{{floatval .Filter.AmountMax}}"
+    hx-get="/api/expenses/table" hx-target="#table-container" hx-include="#filters" hx-trigger="change">
+  <select name="sort" hx-get="/api/expenses/table" hx-target="#table-container" hx-include="#filters" hx-trigger="change">
+    <option value="date" {{if eq .Filter.SortBy "date"}}selected{{end}}>Date</option>
+    <option value="amount" {{if eq .Filter.SortBy "amount"}}selected{{end}}>Amount</option>
+    <option value="subject" {{if eq .Filter.SortBy "subject"}}selected{{end}}>Subject</option>
+    <option value="category" {{if eq .Filter.SortBy "category"}}selected{{end}}>Category</option>
+  </select>
+  <select name="dir" hx-get="/api/expenses/table" hx-target="#table-container" hx-include="#filters" hx-trigger="change">
+    <option value="desc" {{if eq .Filter.SortDir "desc"}}selected{{end}}>Desc</option>
+    <option value="asc" {{if eq .Filter.SortDir "asc"}}selected{{end}}>Asc</option>
+  </select>
+  <a class="btn btn-ghost" href="/">Reset</a>
+</form>
+
+<div id="table-container">
+  {{template "table-body" .}}
+</div>
+{{end}}

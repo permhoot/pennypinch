@@ -1,0 +1,71 @@
+# Copyright © 2026 The Homeport Team
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+
+
+root = "."
+testdata_dir = "testdata"
+tmp_dir = "tmp"
+
+[build]
+  bin = "./tmp/pennypinch"
+  cmd = "go build -o ./tmp/pennypinch cmd/pennypinch/main.go"
+  delay = 1000
+  entrypoint = ["./tmp/pennypinch"]
+  exclude_dir = ["assets", "tmp", "vendor", "testdata"]
+  exclude_regex = ["_test.go"]
+  exclude_unchanged = false
+  follow_symlink = false
+  full_bin = ""
+  ignore_dangerous_root_dir = false
+  include_ext = ["go", "tpl", "tmpl", "html"]
+  kill_delay = "0s"
+  log = "build-errors.log"
+  poll = false
+  poll_interval = 0
+  rerun = false
+  rerun_delay = 500
+  send_interrupt = false
+  stop_on_error = false
+
+[color]
+  app = ""
+  build = "yellow"
+  main = "magenta"
+  mode = ""
+  runner = "green"
+  watcher = "cyan"
+
+[log]
+  main_only = false
+  silent = false
+  time = false
+
+[misc]
+  clean_on_exit = false
+
+[proxy]
+  app_port = 0
+  app_start_timeout = 0
+  enabled = false
+  proxy_port = 0
+
+[screen]
+  clear_on_rebuild = false
+  keep_scroll = true

@@ -1,0 +1,32 @@
+date,amount,subject,description,category
+2026-09-05,-42.50,Grocery Mart,Weekly groceries,Food/Groceries
+2026-09-06,-18.75,Corner Bakery,Coffee and pastries,Food/Dining Out
+2026-09-07,-120.00,Shell,Fuel for car,Transportation/Fuel
+2026-09-08,-32.00,Metro Transit,Monthly bus pass,Transportation/Public Transit
+2026-09-10,-1500.00,Oakwood Apartments,January rent,Housing/Rent
+2026-09-12,-65.40,City Power,Electricity bill,Utilities/Electricity
+2026-09-13,-45.20,Streaming Co,Video streaming subscription,Entertainment/Streaming
+2026-09-15,-28.00,Pharmacy,Prescription refill,Health/Pharmacy
+2026-09-18,-54.99,Pet Supply,Food and litter for cat,Pets/Supplies
+2026-09-20,-15.00,Bookstore,Paperback novel,Entertainment/Books
+2026-09-25,2500.00,Acme Corp,January salary,Income/Salary
+2026-09-28,120.00,Freelance,Logo design gig,Income/Freelance
+2026-09-01,-1500.00,Oakwood Apartments,February rent,Housing/Rent
+2026-09-03,-38.20,Grocery Mart,Weekly groceries,Food/Groceries
+2026-09-05,-25.00,Corner Bakery,Brunch,Food/Dining Out
+2026-09-08,-118.50,Shell,Fuel for car,Transportation/Fuel
+2026-09-10,-12.00,City Cinema,Movie ticket,Entertainment/Movies
+2026-09-12,-70.10,City Power,Electricity bill,Utilities/Electricity
+2026-09-15,-30.00,Pharmacy,Prescription refill,Health/Pharmacy
+2026-09-18,-52.40,Pet Supply,Food and litter for cat,Pets/Supplies
+2026-09-25,2500.00,Acme Corp,February salary,Income/Salary
+2026-09-01,-1500.00,Oakwood Apartments,March rent,Housing/Rent
+2026-09-03,-40.75,Grocery Mart,Weekly groceries,Food/Groceries
+2026-09-05,-19.99,Streaming Co,Music streaming subscription,Entertainment/Streaming
+2026-09-07,-121.00,Shell,Fuel for car,Transportation/Fuel
+2026-09-10,-22.50,Corner Bakery,Lunch,Food/Dining Out
+2026-09-12,-68.30,City Power,Electricity bill,Utilities/Electricity
+2026-09-14,-55.00,Physio Clinic,Monthly physiotherapy,Health/Medical
+2026-09-20,-16.00,Bookstore,Paperback novel,Entertainment/Books
+2026-09-25,2500.00,Acme Corp,March salary,Income/Salary
+2026-09-28,200.00,Freelance,Website update gig,Income/Freelance
