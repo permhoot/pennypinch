@@ -323,6 +323,7 @@ func (s *SQLite) ImportExpenses(ctx context.Context, expenses []model.Expense) (
 
 func (s *SQLite) FindDuplicates(ctx context.Context, expenses []model.Expense) (map[int]bool, error) {
 	dups := make(map[int]bool)
+
 	if len(expenses) == 0 {
 		return dups, nil
 	}
@@ -335,10 +336,12 @@ func (s *SQLite) FindDuplicates(ctx context.Context, expenses []model.Expense) (
 		if end > len(expenses) {
 			end = len(expenses)
 		}
+
 		batch := expenses[start:end]
 
 		sb.Reset()
 		sb.WriteString(`WITH candidates(idx, date, amount, subject, description) AS (VALUES `)
+
 		args := make([]any, 0, len(batch)*5)
 		for i := range batch {
 			if i > 0 {
@@ -347,23 +350,35 @@ func (s *SQLite) FindDuplicates(ctx context.Context, expenses []model.Expense) (
 			sb.WriteString("(?, ?, ?, ?, ?)")
 			args = append(args, start+i, batch[i].Date.String(), batch[i].Amount, batch[i].Subject, batch[i].Description)
 		}
+
 		sb.WriteString(`) SELECT c.idx FROM candidates c WHERE EXISTS (SELECT 1 FROM expenses e WHERE e.date = c.date AND e.amount = c.amount AND e.subject = c.subject AND e.description = c.description)`)
 
-		rows, err := s.db.QueryContext(ctx, sb.String(), args...)
-		if err != nil {
+		if err := s.findDuplicateBatch(ctx, sb.String(), args, dups); err != nil {
 			return nil, err
 		}
-		for rows.Next() {
-			var idx int
-			if err := rows.Scan(&idx); err != nil {
-				_ = rows.Close()
-				return nil, err
-			}
-			dups[idx] = true
-		}
-		_ = rows.Close()
 	}
+
 	return dups, nil
+}
+
+func (s *SQLite) findDuplicateBatch(ctx context.Context, query string, args []any, dups map[int]bool) error {
+	rows, err := s.db.QueryContext(ctx, query, args...)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		_ = rows.Close()
+	}()
+
+	for rows.Next() {
+		var idx int
+		if err := rows.Scan(&idx); err != nil {
+			return err
+		}
+		dups[idx] = true
+	}
+
+	return rows.Err()
 }
 
 func (s *SQLite) DistinctCategories(ctx context.Context) ([]string, error) {
