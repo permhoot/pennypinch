@@ -179,7 +179,7 @@ func (s *Server) handleExportCSV(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handleImportCSV(w http.ResponseWriter, r *http.Request) {
-	if err := r.ParseMultipartForm(32 << 20); err != nil {
+	if err := r.ParseMultipartForm(32 << 20); err != nil { //nolint:gosec // 32MB limit is reasonable for CSV imports
 		writeBadRequest(w, fmt.Errorf("failed to read upload: %w", err))
 		return
 	}

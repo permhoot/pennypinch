@@ -76,7 +76,7 @@ type Manager struct {
 // starts a file watcher for live reload. Returns the manager and the loaded
 // config. The watcher must be closed via Close.
 func LoadManager(path string) (*Manager, error) {
-	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(path), 0o750); err != nil {
 		return nil, fmt.Errorf("create config dir: %w", err)
 	}
 
@@ -104,7 +104,7 @@ func LoadManager(path string) (*Manager, error) {
 }
 
 func loadOrCreate(path string) (*Config, error) {
-	data, err := os.ReadFile(path)
+	data, err := os.ReadFile(path) //nolint:gosec // Path from CLI flag; acceptable for self-hosted homelab tool
 	if err != nil {
 		if os.IsNotExist(err) {
 			cfg := DefaultConfig()

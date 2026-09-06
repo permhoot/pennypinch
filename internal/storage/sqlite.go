@@ -56,7 +56,7 @@ type SQLite struct {
 // OpenSQLite opens (creating if needed) a SQLite database at path and enables
 // WAL mode for better concurrent reads.
 func OpenSQLite(path string) (*SQLite, error) {
-	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(path), 0o750); err != nil {
 		return nil, fmt.Errorf("create data dir: %w", err)
 	}
 
@@ -160,15 +160,18 @@ func (s *SQLite) DeleteExpenses(ctx context.Context, ids []int64) (int64, error)
 		return 0, nil
 	}
 	placeholders := strings.TrimSuffix(strings.Repeat("?,", len(ids)), ",")
+
 	args := make([]any, len(ids))
 	for i, id := range ids {
 		args[i] = id
 	}
-	res, err := s.db.ExecContext(ctx,
-		`DELETE FROM expenses WHERE id IN (`+placeholders+`)`, args...)
+
+	//nolint:gosec // Placeholders are generated from slice length, not user input
+	res, err := s.db.ExecContext(ctx, `DELETE FROM expenses WHERE id IN (`+placeholders+`)`, args...)
 	if err != nil {
 		return 0, err
 	}
+
 	return res.RowsAffected()
 }
 
@@ -441,14 +444,13 @@ func (s *SQLite) YearlyIncomeBySubject(ctx context.Context, year int) (map[strin
 }
 
 func (s *SQLite) categoryTotals(ctx context.Context, clause string, args ...any) (map[string]model.CategoryTotal, int64, error) {
-	rows, err := s.db.QueryContext(ctx,
-		`SELECT category, SUM(amount), COUNT(*) FROM expenses WHERE `+clause+` GROUP BY category`, args...)
+	//nolint:gosec // WHERE clause is built from validated filters in buildListQuery
+	rows, err := s.db.QueryContext(ctx, `SELECT category, SUM(amount), COUNT(*) FROM expenses WHERE `+clause+` GROUP BY category`, args...)
 	if err != nil {
 		return nil, 0, err
 	}
-	defer func() {
-		_ = rows.Close()
-	}()
+
+	defer func() { _ = rows.Close() }()
 
 	totals := make(map[string]model.CategoryTotal)
 	var count int64

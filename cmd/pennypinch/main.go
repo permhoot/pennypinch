@@ -55,7 +55,7 @@ func run() error {
 		*dataDir = "./data"
 	}
 
-	if err := os.MkdirAll(*dataDir, 0o755); err != nil {
+	if err := os.MkdirAll(*dataDir, 0o750); err != nil {
 		return err
 	}
 

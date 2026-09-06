@@ -22,6 +22,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/permhoot/pennypinch/internal/config"
@@ -102,11 +103,12 @@ func (s *Service) ImportExpenses(ctx context.Context, parsed []ParsedExpense) (*
 	imported, err := s.Store.ImportExpenses(ctx, expenses)
 	if err != nil {
 		if restoreErr := s.Config.RestoreCategories(before); restoreErr != nil {
-			return nil, fmt.Errorf("import to database: %w (restore config failed: %v)", err, restoreErr)
+			return nil, fmt.Errorf("import to database failed: %w", errors.Join(err, restoreErr))
 		}
 
 		return nil, fmt.Errorf("import to database: %w", err)
 	}
+
 	result.Imported = int(imported)
 
 	return result, nil

@@ -65,7 +65,7 @@ var funcs = template.FuncMap{
 		if err != nil {
 			return template.JS("null")
 		}
-		return template.JS(b)
+		return template.JS(b) //nolint:gosec // JSON marshaled data is safe for template.JS
 	},
 }
 

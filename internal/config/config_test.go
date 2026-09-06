@@ -70,7 +70,7 @@ var _ = Describe("Manager", func() {
 			var err error
 
 			BeforeEach(func() {
-				Expect(os.WriteFile(path, []byte("categories: [not-a-map"), 0o644)).To(Succeed())
+				Expect(os.WriteFile(path, []byte("categories: [not-a-map"), 0o600)).To(Succeed())
 			})
 
 			JustBeforeEach(func() {
