@@ -56,6 +56,10 @@ type Storage interface {
 	// ImportExpenses inserts all expenses in a single transaction.
 	ImportExpenses(ctx context.Context, expenses []model.Expense) (int64, error)
 
+	// FindDuplicates returns the indices (into expenses) of rows that already
+	// exist in the database, matched by (date, amount, subject, description).
+	FindDuplicates(ctx context.Context, expenses []model.Expense) (map[int]bool, error)
+
 	DistinctCategories(ctx context.Context) ([]string, error)
 
 	MonthlyTotals(ctx context.Context, year, month int) (map[string]model.CategoryTotal, int64, error)

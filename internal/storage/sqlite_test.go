@@ -21,6 +21,7 @@ package storage
 
 import (
 	"context"
+	"fmt"
 	"path/filepath"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -160,6 +161,70 @@ var _ = Describe("SQLite", func() {
 			_, total, err := s.ListExpenses(ctx, Filter{PageSize: 100})
 			Expect(err).NotTo(HaveOccurred())
 			Expect(total).To(Equal(int64(2)))
+		})
+	})
+
+	Describe("FindDuplicates", func() {
+		It("returns empty when no expenses exist", func() {
+			d, err := model.ParseDate("2024-01-05")
+			Expect(err).NotTo(HaveOccurred())
+
+			dups, err := s.FindDuplicates(ctx, []model.Expense{
+				{Date: d, Amount: -1.00, Subject: "a", Description: "desc"},
+			})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(dups).To(BeEmpty())
+		})
+
+		It("detects exact duplicates", func() {
+			d1, _ := model.ParseDate("2024-01-05")
+			d2, _ := model.ParseDate("2024-01-06")
+			insertExpense("2024-01-05", -42.50, "A", "")
+
+			dups, err := s.FindDuplicates(ctx, []model.Expense{
+				{Date: d1, Amount: -42.50, Subject: "A", Description: ""},
+				{Date: d2, Amount: -120.00, Subject: "B", Description: ""},
+			})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(dups).To(HaveKey(0))
+			Expect(dups).NotTo(HaveKey(1))
+		})
+
+		It("differentiates by description", func() {
+			d1, _ := model.ParseDate("2024-01-05")
+			insertExpense("2024-01-05", -42.50, "A", "desc one")
+
+			dups, err := s.FindDuplicates(ctx, []model.Expense{
+				{Date: d1, Amount: -42.50, Subject: "A", Description: "desc two"},
+			})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(dups).To(BeEmpty())
+		})
+
+		It("handles empty slice", func() {
+			dups, err := s.FindDuplicates(ctx, nil)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(dups).To(BeEmpty())
+		})
+
+		It("batches large input correctly", func() {
+			d, _ := model.ParseDate("2024-01-05")
+
+			inserted := make([]model.Expense, 200)
+			for i := range inserted {
+				inserted[i] = model.Expense{
+					Date:        d,
+					Amount:      float64(-i - 1),
+					Subject:     fmt.Sprintf("subj-%d", i),
+					Description: fmt.Sprintf("desc-%d", i),
+				}
+			}
+			_, err := s.ImportExpenses(ctx, inserted)
+			Expect(err).NotTo(HaveOccurred())
+
+			dups, err := s.FindDuplicates(ctx, inserted)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(dups).To(HaveLen(200))
 		})
 	})
 })

@@ -65,6 +65,7 @@ var _ = Describe("ImportExpenses", func() {
 		result, err := s.ImportExpenses(ctx, parsed)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(result.Imported).To(Equal(2))
+		Expect(result.Duplicates).To(Equal(0))
 		Expect(result.NewCategories).To(HaveLen(2))
 
 		cfg := s.Config.Snapshot()
@@ -74,6 +75,68 @@ var _ = Describe("ImportExpenses", func() {
 		}
 		Expect(names).To(HaveKey("food/groceries"))
 		Expect(names).To(HaveKey("income/salary"))
+	})
+
+	It("skips duplicates on re-import", func() {
+		s := newTestService()
+		ctx := context.Background()
+
+		parsed := []ParsedExpense{
+			{Expense: mustExpense("2024-01-05", -42.50, "A", "Food/Groceries"), Line: 2},
+			{Expense: mustExpense("2024-01-06", 2500.00, "B", "Income/Salary"), Line: 3},
+		}
+
+		_, err := s.ImportExpenses(ctx, parsed)
+		Expect(err).NotTo(HaveOccurred())
+
+		result, err := s.ImportExpenses(ctx, parsed)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(result.Imported).To(Equal(0))
+		Expect(result.Duplicates).To(Equal(2))
+	})
+
+	It("imports only new rows when partial overlap", func() {
+		s := newTestService()
+		ctx := context.Background()
+
+		parsed1 := []ParsedExpense{
+			{Expense: mustExpense("2024-01-05", -42.50, "A", "Food/Groceries"), Line: 2},
+		}
+		_, err := s.ImportExpenses(ctx, parsed1)
+		Expect(err).NotTo(HaveOccurred())
+
+		parsed2 := []ParsedExpense{
+			{Expense: mustExpense("2024-01-05", -42.50, "A", "Food/Groceries"), Line: 2},
+			{Expense: mustExpense("2024-01-06", 2500.00, "B", "Income/Salary"), Line: 3},
+		}
+		result, err := s.ImportExpenses(ctx, parsed2)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(result.Imported).To(Equal(1))
+		Expect(result.Duplicates).To(Equal(1))
+	})
+
+	It("matches duplicates by description too", func() {
+		s := newTestService()
+		ctx := context.Background()
+
+		d1, _ := model.ParseDate("2024-01-05")
+		e1 := model.Expense{Date: d1, Amount: -42.50, Subject: "A", Description: "desc one", Category: "food"}
+		e2 := model.Expense{Date: d1, Amount: -42.50, Subject: "A", Description: "desc two", Category: "food"}
+		cat, _ := NormalizeCategoryPath("food")
+		e1.Category = cat
+		e2.Category = cat
+
+		_, err := s.ImportExpenses(ctx, []ParsedExpense{
+			{Expense: e1, Line: 2},
+		})
+		Expect(err).NotTo(HaveOccurred())
+
+		result, err := s.ImportExpenses(ctx, []ParsedExpense{
+			{Expense: e2, Line: 3},
+		})
+		Expect(err).NotTo(HaveOccurred())
+		Expect(result.Imported).To(Equal(1))
+		Expect(result.Duplicates).To(Equal(0))
 	})
 })
 

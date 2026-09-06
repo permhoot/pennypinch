@@ -38,6 +38,7 @@ type Service struct {
 // ImportResult reports the outcome of a CSV import.
 type ImportResult struct {
 	Imported      int           `json:"imported"`
+	Duplicates    int           `json:"duplicates"`
 	NewCategories []string      `json:"new_categories"`
 	Errors        []ImportError `json:"errors"`
 }
@@ -45,13 +46,37 @@ type ImportResult struct {
 // ImportExpenses validates already-parsed rows, adds any new categories to the
 // config (atomically), then inserts the expenses in a single transaction. If
 // the database insert fails, the config is rolled back to its prior state.
+// Duplicate rows (same date, amount, subject, description) are skipped.
 func (s *Service) ImportExpenses(ctx context.Context, parsed []ParsedExpense) (*ImportResult, error) {
-	result := &ImportResult{Imported: len(parsed)}
+	result := &ImportResult{}
+
+	allExpenses := make([]model.Expense, len(parsed))
+	for i, p := range parsed {
+		allExpenses[i] = p.Expense
+	}
+
+	dupIdx, err := s.Store.FindDuplicates(ctx, allExpenses)
+	if err != nil {
+		return nil, fmt.Errorf("find duplicates: %w", err)
+	}
+
+	var toImport []ParsedExpense
+	for i, p := range parsed {
+		if dupIdx[i] {
+			result.Duplicates++
+		} else {
+			toImport = append(toImport, p)
+		}
+	}
+
+	if len(toImport) == 0 {
+		return result, nil
+	}
 
 	// Collect unique normalized category paths in first-seen order.
 	seen := make(map[string]bool)
 	var categories []string
-	for _, p := range parsed {
+	for _, p := range toImport {
 		if p.Expense.Category != "" && !seen[p.Expense.Category] {
 			seen[p.Expense.Category] = true
 			categories = append(categories, p.Expense.Category)
@@ -69,16 +94,18 @@ func (s *Service) ImportExpenses(ctx context.Context, parsed []ParsedExpense) (*
 		result.NewCategories = append(result.NewCategories, c.Name)
 	}
 
-	expenses := make([]model.Expense, len(parsed))
-	for i, p := range parsed {
+	expenses := make([]model.Expense, len(toImport))
+	for i, p := range toImport {
 		expenses[i] = p.Expense
 	}
 
-	if _, err := s.Store.ImportExpenses(ctx, expenses); err != nil {
+	imported, err := s.Store.ImportExpenses(ctx, expenses)
+	if err != nil {
 		// Roll back the config additions.
 		s.Config.RestoreCategories(before)
 		return nil, fmt.Errorf("import to database: %w", err)
 	}
+	result.Imported = int(imported)
 
 	return result, nil
 }
