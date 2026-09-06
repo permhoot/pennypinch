@@ -50,6 +50,70 @@ Templates and static assets are embedded via `go:embed`. The binary is self-cont
 - **Command**: `go test ./...`
 - **Patterns**: Use `Describe`/`It` blocks. In-memory SQLite for storage tests.
 
+### Expected Ginkgo style
+
+Use Setup, Execute, and Assert style:
+
+```go
+var _ = Describe("High-level description", func() {
+	var veryGlobalVar any
+
+	BeforeEach(func() {
+		veryGlobalVar = setupSomeGlobalClient()
+	})
+
+	Context("description of the setup/context of this section", func() {
+		var result any
+		var err error
+
+		BeforeEach(func() {
+			// Code that actually sets up exactly what the context
+			// description describes. Usually a series of code blocks
+			// that set it up and initialize variables for this section,
+			// for example creating a test input or test files.
+		})
+
+		JustBeforeEach(func() {
+			// Ideally just one function/method call that exectutes
+			// exactly what we want to have test assertions for.
+			result, err = veryGlobalVar.Foobar()
+		})
+
+		It("does not error", func() {
+			Expect(err).ToNot(HaveOccurred())
+		})
+
+		It("should describe the test assertion", func() {
+			Expect(result).To(Equal("exactly what we expect"))
+		})
+
+		Context("optional sub-context", func() {
+			BeforeEach(func() {
+				// setting up the optional sub-context on top of the outher context
+			})
+
+			It("describe test assertion", func() {
+				Expect(something).To(Equal(expectedSomething))
+			})
+		})
+	})
+
+	Context("next context following the same style and logic", func() {
+		// ...
+	})
+
+	When("some other description", func ()  {
+		// When is used when the description as a sentence sounds good
+		// with the word when in it, e.g. When("there is no user input")
+	})
+})
+
+// setupSomeGlobalClient is a helper function and is placed at the end of the test file
+func setupSomeGlobalClient() any {
+	return nil
+}
+```
+
 ## Git Workflow
 
 - **Branches**: Feature branches off `main`. Open a PR to merge.
