@@ -114,6 +114,8 @@ func setupSomeGlobalClient() any {
 }
 ```
 
+Note: Ideally, there is *only* one `Expect` per `It`.
+
 ## Git Workflow
 
 - **Branches**: Feature branches off `main`. Open a PR to merge.
