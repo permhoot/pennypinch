@@ -45,6 +45,7 @@ Templates and static assets are embedded via `go:embed`. The binary is self-cont
 - **Error handling**: Return errors up the stack. Log only in `main` or when irrecoverable.
 - **Function body layout**: Separate logical blocks with blank lines. Each guard clause, variable declaration/initialization, loop, error-checked call, and return statement should be its own visually distinct block. Do not pack unrelated statements together without a blank line between them.
 - **Line wrapping**: Keep function calls on a single line when they fit within a reasonable width. Avoid splitting argument lists across multiple lines when the call can be expressed on one line. Multi-line wrapping is acceptable for long SQL strings or struct literals that genuinely exceed readable line length.
+- **Naming**: Do not disambiguate variables by appending a numeric suffix (e.g. `m2`, `err2`, `cfg3`). Choose a name that describes the variable's role or context even when the most obvious name is already taken by an outer scope (e.g. `fresh` instead of `m2` for a freshly loaded instance).
 - **Nesting**: Prefer early returns (guard clauses) over deep nesting. Validate preconditions and bail out at the top so the main logic flows linearly at one indentation level. Nesting is acceptable when it genuinely simplifies the code, but as a rule keep it shallow.
 
 ### Function body style example
