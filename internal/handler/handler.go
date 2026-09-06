@@ -17,6 +17,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
+
 package handler
 
 import (
@@ -159,12 +160,12 @@ func parseFilter(r *http.Request) (storage.Filter, error) {
 	q := r.URL.Query()
 
 	f := storage.Filter{
-		Search:    strings.TrimSpace(q.Get("search")),
-		Category:  strings.TrimSpace(q.Get("category")),
-		SortBy:    strings.TrimSpace(q.Get("sort")),
-		SortDir:   strings.TrimSpace(q.Get("dir")),
-		Page:      intParam(q.Get("page"), 1),
-		PageSize:  intParam(q.Get("page_size"), 50),
+		Search:   strings.TrimSpace(q.Get("search")),
+		Category: strings.TrimSpace(q.Get("category")),
+		SortBy:   strings.TrimSpace(q.Get("sort")),
+		SortDir:  strings.TrimSpace(q.Get("dir")),
+		Page:     intParam(q.Get("page"), 1),
+		PageSize: intParam(q.Get("page_size"), 50),
 	}
 	if f.PageSize < 1 {
 		f.PageSize = 50

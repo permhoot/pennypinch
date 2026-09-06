@@ -17,6 +17,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
+
 package handler
 
 import (
@@ -43,12 +44,22 @@ var funcs = template.FuncMap{
 		}
 		return currency + amount
 	},
-	"top":      service.TopLevelCategory,
-	"sub":      func(a, b int) int { return a - b },
-	"add":      func(a, b int) int { return a + b },
-	"dateval":  func(t *time.Time) string { if t == nil { return "" }; return t.Format("2006-01-02") },
-	"floatval": func(f *float64) string { if f == nil { return "" }; return strconv.FormatFloat(*f, 'f', 2, 64) },
-	"pages":    pageList,
+	"top": service.TopLevelCategory,
+	"sub": func(a, b int) int { return a - b },
+	"add": func(a, b int) int { return a + b },
+	"dateval": func(t *time.Time) string {
+		if t == nil {
+			return ""
+		}
+		return t.Format("2006-01-02")
+	},
+	"floatval": func(f *float64) string {
+		if f == nil {
+			return ""
+		}
+		return strconv.FormatFloat(*f, 'f', 2, 64)
+	},
+	"pages": pageList,
 	"json": func(v any) template.JS {
 		b, err := json.Marshal(v)
 		if err != nil {

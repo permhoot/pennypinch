@@ -17,6 +17,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
+
 package service
 
 import (
@@ -42,8 +43,8 @@ type ImportError struct {
 
 // ParsedExpense is a validated expense ready for import.
 type ParsedExpense struct {
-	Expense  model.Expense
-	Line     int
+	Expense model.Expense
+	Line    int
 }
 
 // CSVTemplate returns example rows and column explanations for the download.
