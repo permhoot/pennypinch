@@ -52,7 +52,7 @@ Templates and static assets are embedded via `go:embed`. The binary is self-cont
 
 ### Expected Ginkgo style
 
-Use Setup, Execute, and Assert style:
+Use [Arrange-Act-Assert](https://automationpanda.com/2020/07/07/arrange-act-assert-a-pattern-for-writing-good-tests/):
 
 ```go
 var _ = Describe("High-level description", func() {
@@ -66,24 +66,24 @@ var _ = Describe("High-level description", func() {
 		var result any
 		var err error
 
-		BeforeEach(func() {
+		BeforeEach(func() { // Arrange
 			// Code that actually sets up exactly what the context
 			// description describes. Usually a series of code blocks
 			// that set it up and initialize variables for this section,
 			// for example creating a test input or test files.
 		})
 
-		JustBeforeEach(func() {
+		JustBeforeEach(func() { // Act
 			// Ideally just one function/method call that exectutes
 			// exactly what we want to have test assertions for.
 			result, err = veryGlobalVar.Foobar()
 		})
 
-		It("does not error", func() {
+		It("does not error", func() { // Assert
 			Expect(err).ToNot(HaveOccurred())
 		})
 
-		It("should describe the test assertion", func() {
+		It("should describe the test assertion", func() { // Assert
 			Expect(result).To(Equal("exactly what we expect"))
 		})
 
