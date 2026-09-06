@@ -191,14 +191,19 @@ func (m *Manager) watchLoop() {
 }
 
 func (m *Manager) reload() {
+	m.writeMu.Lock()
+	defer m.writeMu.Unlock()
+
 	cfg, err := loadOrCreate(m.path)
 	if err != nil {
 		return
 	}
+
 	m.mu.Lock()
 	m.config = cfg
 	callbacks := m.onChange
 	m.mu.Unlock()
+
 	for _, cb := range callbacks {
 		cb(cfg)
 	}
