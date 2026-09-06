@@ -102,8 +102,10 @@ func (s *Service) ImportExpenses(ctx context.Context, parsed []ParsedExpense) (*
 
 	imported, err := s.Store.ImportExpenses(ctx, expenses)
 	if err != nil {
-		// Roll back the config additions.
-		s.Config.RestoreCategories(before)
+		if restoreErr := s.Config.RestoreCategories(before); restoreErr != nil {
+			return nil, fmt.Errorf("import to database: %w (restore config failed: %v)", err, restoreErr)
+		}
+
 		return nil, fmt.Errorf("import to database: %w", err)
 	}
 	result.Imported = int(imported)

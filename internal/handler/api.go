@@ -188,7 +188,7 @@ func (s *Server) handleImportCSV(w http.ResponseWriter, r *http.Request) {
 		writeBadRequest(w, fmt.Errorf("missing file field: %w", err))
 		return
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	parsed, errs := service.ParseCSV(file)
 	if len(errs) > 0 {

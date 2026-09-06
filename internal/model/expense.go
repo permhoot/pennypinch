@@ -46,7 +46,7 @@ func ParseDate(s string) (Date, error) {
 }
 
 func (d Date) String() string {
-	return d.Time.Format("2006-01-02")
+	return d.Format("2006-01-02")
 }
 
 func (d Date) MarshalJSON() ([]byte, error) {

@@ -68,15 +68,15 @@ func OpenSQLite(path string) (*SQLite, error) {
 	db.SetMaxOpenConns(1)
 
 	if _, err := db.Exec("PRAGMA journal_mode=WAL;"); err != nil {
-		db.Close()
+		_ = db.Close()
 		return nil, fmt.Errorf("enable WAL: %w", err)
 	}
 	if _, err := db.Exec("PRAGMA foreign_keys=OFF;"); err != nil {
-		db.Close()
+		_ = db.Close()
 		return nil, fmt.Errorf("set pragma: %w", err)
 	}
 	if _, err := db.Exec(schema); err != nil {
-		db.Close()
+		_ = db.Close()
 		return nil, fmt.Errorf("create schema: %w", err)
 	}
 
@@ -256,7 +256,9 @@ func (s *SQLite) ListExpenses(ctx context.Context, f Filter) ([]model.Expense, i
 	if err != nil {
 		return nil, 0, err
 	}
-	defer rows.Close()
+	defer func() {
+		_ = rows.Close()
+	}()
 
 	expenses := make([]model.Expense, 0)
 	for rows.Next() {
@@ -275,7 +277,9 @@ func (s *SQLite) AllExpenses(ctx context.Context) ([]model.Expense, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() {
+		_ = rows.Close()
+	}()
 
 	expenses := make([]model.Expense, 0)
 	for rows.Next() {
@@ -293,14 +297,18 @@ func (s *SQLite) ImportExpenses(ctx context.Context, expenses []model.Expense) (
 	if err != nil {
 		return 0, err
 	}
-	defer tx.Rollback()
+	defer func() {
+		_ = tx.Rollback()
+	}()
 
 	stmt, err := tx.PrepareContext(ctx,
 		`INSERT INTO expenses (date, amount, subject, description, category) VALUES (?, ?, ?, ?, ?)`)
 	if err != nil {
 		return 0, err
 	}
-	defer stmt.Close()
+	defer func() {
+		_ = stmt.Close()
+	}()
 
 	for i := range expenses {
 		if _, err := stmt.ExecContext(ctx, expenseArgs(&expenses[i])...); err != nil {
@@ -348,12 +356,12 @@ func (s *SQLite) FindDuplicates(ctx context.Context, expenses []model.Expense) (
 		for rows.Next() {
 			var idx int
 			if err := rows.Scan(&idx); err != nil {
-				rows.Close()
+				_ = rows.Close()
 				return nil, err
 			}
 			dups[idx] = true
 		}
-		rows.Close()
+		_ = rows.Close()
 	}
 	return dups, nil
 }
@@ -364,7 +372,9 @@ func (s *SQLite) DistinctCategories(ctx context.Context) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() {
+		_ = rows.Close()
+	}()
 
 	var cats []string
 	for rows.Next() {
@@ -396,7 +406,9 @@ func (s *SQLite) YearlyIncomeBySubject(ctx context.Context, year int) (map[strin
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() {
+		_ = rows.Close()
+	}()
 
 	out := make(map[string]float64)
 	for rows.Next() {
@@ -419,7 +431,9 @@ func (s *SQLite) categoryTotals(ctx context.Context, clause string, args ...any)
 	if err != nil {
 		return nil, 0, err
 	}
-	defer rows.Close()
+	defer func() {
+		_ = rows.Close()
+	}()
 
 	totals := make(map[string]model.CategoryTotal)
 	var count int64
