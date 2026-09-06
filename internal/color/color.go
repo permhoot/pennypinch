@@ -103,18 +103,6 @@ func isHexTriplet(s string) bool {
 	return true
 }
 
-// ColorForCategory resolves the display color for a category. When the
-// category has an explicitly configured color it is used; otherwise a
-// deterministic color is derived from the palette using the category name.
-func ColorForCategory(name, configured string) string {
-	if configured != "" {
-		if c, err := NormalizeColor(configured); err == nil {
-			return c
-		}
-	}
-	return PaletteColor(name, DefaultPalette)
-}
-
 // PaletteColor picks a stable palette entry for a given key.
 func PaletteColor(key string, palette []string) string {
 	if len(palette) == 0 {

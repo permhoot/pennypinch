@@ -23,7 +23,6 @@ package service
 import (
 	"context"
 	"fmt"
-	"sort"
 
 	"github.com/permhoot/pennypinch/internal/config"
 	"github.com/permhoot/pennypinch/internal/model"
@@ -111,14 +110,4 @@ func (s *Service) ImportExpenses(ctx context.Context, parsed []ParsedExpense) (*
 	result.Imported = int(imported)
 
 	return result, nil
-}
-
-// DistinctCategories returns all category paths currently present in expenses.
-func (s *Service) DistinctCategories(ctx context.Context) ([]string, error) {
-	cats, err := s.Store.DistinctCategories(ctx)
-	if err != nil {
-		return nil, err
-	}
-	sort.Strings(cats)
-	return cats, nil
 }

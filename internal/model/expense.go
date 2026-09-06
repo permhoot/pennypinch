@@ -31,11 +31,6 @@ type Date struct {
 	time.Time
 }
 
-// NewDate builds a Date from a year/month/day triple, normalized to UTC midnight.
-func NewDate(year int, month time.Month, day int) Date {
-	return Date{Time: time.Date(year, month, day, 0, 0, 0, 0, time.UTC)}
-}
-
 // ParseDate parses a YYYY-MM-DD string.
 func ParseDate(s string) (Date, error) {
 	t, err := time.Parse("2006-01-02", s)

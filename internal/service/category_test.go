@@ -66,14 +66,3 @@ var _ = Describe("TopLevelCategory", func() {
 		Entry("transportation", "transportation/fuel", "transportation"),
 	)
 })
-
-var _ = Describe("Parent", func() {
-	DescribeTable("returns the parent path",
-		func(input, want string) {
-			Expect(Parent(input)).To(Equal(want))
-		},
-		Entry("three levels", "food/groceries/supermarket", "food/groceries"),
-		Entry("two levels", "food/groceries", "food"),
-		Entry("top level has no parent", "food", ""),
-	)
-})

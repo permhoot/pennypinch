@@ -56,20 +56,3 @@ func TopLevelCategory(normalizedPath string) string {
 	}
 	return normalizedPath
 }
-
-// Components splits a normalized category path into its components.
-func Components(normalizedPath string) []string {
-	if normalizedPath == "" {
-		return nil
-	}
-	return strings.Split(normalizedPath, "/")
-}
-
-// Parent returns the normalized path one level up, or "" for top-level paths.
-func Parent(normalizedPath string) string {
-	comps := Components(normalizedPath)
-	if len(comps) <= 1 {
-		return ""
-	}
-	return strings.Join(comps[:len(comps)-1], "/")
-}

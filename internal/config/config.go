@@ -65,12 +65,11 @@ func DefaultConfig() *Config {
 // Manager owns the in-memory config, handles persistence (atomic writes) and
 // file watching (fsnotify) for live reload.
 type Manager struct {
-	mu       sync.RWMutex
-	writeMu  sync.Mutex
-	path     string
-	config   *Config
-	watcher  *fsnotify.Watcher
-	onChange []func(*Config)
+	mu      sync.RWMutex
+	writeMu sync.Mutex
+	path    string
+	config  *Config
+	watcher *fsnotify.Watcher
 }
 
 // LoadManager reads config from path, creating a default file if missing, and
@@ -201,12 +200,7 @@ func (m *Manager) reload() {
 
 	m.mu.Lock()
 	m.config = cfg
-	callbacks := m.onChange
 	m.mu.Unlock()
-
-	for _, cb := range callbacks {
-		cb(cfg)
-	}
 }
 
 // Close stops the file watcher.
@@ -226,13 +220,6 @@ func (m *Manager) Snapshot() *Config {
 	return &c
 }
 
-// OnChange registers a callback invoked after a config reload.
-func (m *Manager) OnChange(fn func(*Config)) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	m.onChange = append(m.onChange, fn)
-}
-
 // RestoreCategories replaces the category list with the given snapshot and
 // atomically persists it. Used to roll back a failed import.
 func (m *Manager) RestoreCategories(categories []model.Category) error {
@@ -243,27 +230,6 @@ func (m *Manager) RestoreCategories(categories []model.Category) error {
 	defer m.mu.Unlock()
 	m.config.Categories = append([]model.Category(nil), categories...)
 	return writeAtomic(m.path, m.config)
-}
-
-// CategoryByName returns the category with the given canonical name, if any.
-func (m *Manager) CategoryByName(name string) (model.Category, bool) {
-	m.mu.RLock()
-	defer m.mu.RUnlock()
-	for _, c := range m.config.Categories {
-		if c.Name == name {
-			return c, true
-		}
-	}
-	return model.Category{}, false
-}
-
-// CategoryColor resolves the configured color for a category, or "" if the
-// category is not configured or has no color.
-func (m *Manager) CategoryColor(name string) string {
-	if c, ok := m.CategoryByName(name); ok {
-		return c.Color
-	}
-	return ""
 }
 
 // EnsureCategories adds any missing category names to the config, assigning
