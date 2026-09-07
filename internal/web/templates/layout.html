@@ -41,10 +41,21 @@ THE SOFTWARE.
       <a href="/yearly" class="{{if eq .Active "yearly"}}active{{end}}">Yearly</a>
     </nav>
     <div class="actions">
-      <a class="btn" href="/api/expenses/export">Export CSV</a>
-      <a class="btn" href="/api/import/template">Template</a>
-      <button class="btn" id="import-btn" type="button">Import CSV</button>
-      <button class="btn" id="theme-toggle" type="button" aria-label="Toggle theme">Theme</button>
+      <div class="dropdown">
+        <button class="btn btn-icon" id="settings-btn" type="button" aria-label="Settings" aria-haspopup="true" aria-expanded="false">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+        <div class="dropdown-menu" id="settings-menu" role="menu" hidden>
+          <button class="dropdown-item" id="import-btn" type="button" role="menuitem">Import CSV</button>
+          <a class="dropdown-item" href="/api/expenses/export" role="menuitem">Export CSV</a>
+          <a class="dropdown-item" href="/api/import/template" role="menuitem">Download sample</a>
+          <div class="dropdown-divider" role="separator"></div>
+          <button class="dropdown-item" id="theme-toggle" type="button" role="menuitem">Change theme</button>
+        </div>
+      </div>
     </div>
   </header>
 

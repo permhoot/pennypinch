@@ -231,9 +231,46 @@
     });
   }
 
+  /* ---- Settings Dropdown ---- */
+  function initDropdown() {
+    const btn = document.getElementById('settings-btn');
+    const menu = document.getElementById('settings-menu');
+    if (!btn || !menu) return;
+
+    function close() {
+      menu.hidden = true;
+      btn.setAttribute('aria-expanded', 'false');
+    }
+
+    function open() {
+      menu.hidden = false;
+      btn.setAttribute('aria-expanded', 'true');
+    }
+
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (menu.hidden) {
+        open();
+      } else {
+        close();
+      }
+    });
+
+    menu.addEventListener('click', function (e) {
+      e.stopPropagation();
+    });
+
+    document.addEventListener('click', close);
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') close();
+    });
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     initTheme();
     initImport();
+    initDropdown();
 
     const toast = document.getElementById('toast');
     if (toast) toast.addEventListener('click', hideToast);
