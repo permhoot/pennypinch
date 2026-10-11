@@ -23,7 +23,58 @@ package service
 import (
 	"fmt"
 	"strings"
+
+	"github.com/permhoot/pennypinch/internal/color"
+	"github.com/permhoot/pennypinch/internal/model"
 )
+
+// TopLevelCategory returns the first component before the first slash, or the
+// whole string when there is no slash. Input must already be normalized; the
+// result is returned unchanged otherwise.
+func TopLevelCategory(normalizedPath string) string {
+	if i := strings.IndexByte(normalizedPath, '/'); i >= 0 {
+		return normalizedPath[:i]
+	}
+	return normalizedPath
+}
+
+// ResolveCategoryParts splits a normalized category path into per-component
+// parts, each resolved with a display color and description looked up in the
+// supplied category list. Each successive part's color and description falls
+// back to the most specific matching entry in the config (i.e. the longest
+// matching prefix path). When no matching entry exists, the color is derived
+// from a stable palette and the description stays empty.
+func ResolveCategoryParts(categories []model.Category, path string) []model.CategoryPart {
+	if path == "" {
+		return nil
+	}
+
+	components := strings.Split(path, "/")
+	parts := make([]model.CategoryPart, 0, len(components))
+	seen := make(map[string]bool)
+	for i, comp := range components {
+		full := strings.Join(components[:i+1], "/")
+		if seen[full] {
+			continue
+		}
+		seen[full] = true
+
+		part := model.CategoryPart{Name: comp, FullPath: full}
+		part.Color = color.PaletteColor(full, color.DefaultPalette)
+		for _, c := range categories {
+			if c.Name != full {
+				continue
+			}
+			if c.Color != "" {
+				part.Color = color.NormalizeColorOr(c.Color, part.Color)
+			}
+			part.Description = c.Description
+			break
+		}
+		parts = append(parts, part)
+	}
+	return parts
+}
 
 // NormalizeCategoryPath trims outer whitespace, splits on "/", trims and
 // collapses internal whitespace in each component, rejects empty components,
@@ -45,14 +96,4 @@ func NormalizeCategoryPath(path string) (string, error) {
 		components = append(components, strings.ToLower(comp))
 	}
 	return strings.Join(components, "/"), nil
-}
-
-// TopLevelCategory returns the first component before the first slash, or the
-// whole string when there is no slash. Input must already be normalized; the
-// result is returned unchanged otherwise.
-func TopLevelCategory(normalizedPath string) string {
-	if i := strings.IndexByte(normalizedPath, '/'); i >= 0 {
-		return normalizedPath[:i]
-	}
-	return normalizedPath
 }

@@ -19,6 +19,14 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -->
+{{define "category-chips"}}
+<span class="category-chips">
+  {{range categoryParts .Categories .Path}}
+  <span class="category-chip" style="--chip-color:{{.Color}}" {{if .Description}}title="{{.FullPath}} — {{.Description}}"{{else}}title="{{.FullPath}}"{{end}}>{{.Name}}</span>
+  {{end}}
+</span>
+{{end}}
+
 {{define "table-body"}}
 <div class="table-meta">
   <span>{{.Total}} records</span>
@@ -41,7 +49,7 @@ THE SOFTWARE.
       <td class="date">{{.Date}}</td>
       <td>{{.Subject}}</td>
       <td class="muted">{{.Description}}</td>
-      <td><span class="category-chip">{{.Category}}</span></td>
+      <td>{{template "category-chips" (dict "Categories" $.Categories "Path" .Category)}}</td>
       <td class="num {{if .IsIncome}}income{{else}}expense{{end}}">{{if $.CurrencyInCells}}{{formatAmount .Amount $.Currency $.CurrencyPosition}}{{else}}{{money .Amount}}{{end}}</td>
     </tr>
     {{else}}

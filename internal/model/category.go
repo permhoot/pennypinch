@@ -27,3 +27,12 @@ type Category struct {
 	Description string `json:"description" yaml:"description"`
 	Color       string `json:"color" yaml:"color"`
 }
+
+// CategoryPart is one component of a slash-separated category path, resolved
+// with display color and description for template rendering.
+type CategoryPart struct {
+	Name        string
+	FullPath    string
+	Color       string
+	Description string
+}

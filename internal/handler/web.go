@@ -38,6 +38,7 @@ type pageData struct {
 	CurrencyPosition string
 	CurrencyInCells  bool
 	Active           string
+	Categories       []model.Category
 }
 
 type tablePageData struct {
@@ -83,6 +84,7 @@ type tablePartialData struct {
 	CurrencyPosition string
 	CurrencyInCells  bool
 	Filter           storage.Filter
+	Categories       []model.Category
 }
 
 func (s *Server) handleTablePage(w http.ResponseWriter, r *http.Request) {
@@ -115,6 +117,7 @@ func (s *Server) handleTablePage(w http.ResponseWriter, r *http.Request) {
 			CurrencyPosition: cfg.Settings.CurrencyPosition,
 			CurrencyInCells:  cfg.Settings.CurrencyInCells,
 			Active:           "table",
+			Categories:       cfg.Categories,
 		},
 		Expenses: expenses,
 		Total:    total,
@@ -156,6 +159,7 @@ func (s *Server) handleTablePartial(w http.ResponseWriter, r *http.Request) {
 		CurrencyPosition: cfg.Settings.CurrencyPosition,
 		CurrencyInCells:  cfg.Settings.CurrencyInCells,
 		Filter:           f,
+		Categories:       cfg.Categories,
 	}
 	s.table.render(w, "table-body", data)
 }
@@ -190,6 +194,7 @@ func (s *Server) handleMonthlyPage(w http.ResponseWriter, r *http.Request) {
 			CurrencyPosition: cfg.Settings.CurrencyPosition,
 			CurrencyInCells:  cfg.Settings.CurrencyInCells,
 			Active:           "monthly",
+			Categories:       cfg.Categories,
 		},
 		Year:      year,
 		Month:     month,
